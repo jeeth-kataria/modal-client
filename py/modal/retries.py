@@ -134,8 +134,6 @@ class RetryManager:
         if attempt_count < 1:
             raise ValueError(f"Cannot compute retry delay. attempt_count must be at least 1, but was {attempt_count}")
         delay_ms = retry_policy.initial_delay_ms * (retry_policy.backoff_coefficient ** (attempt_count - 1))
-        if delay_ms < MIN_INPUT_RETRY_DELAY_MS:
-            return MIN_INPUT_RETRY_DELAY_MS
-        if delay_ms > MAX_INPUT_RETRY_DELAY_MS:
-            return MAX_INPUT_RETRY_DELAY_MS
-        return delay_ms
+        # Policies without an explicit cap have a zero max_delay_ms in the protobuf.
+        max_delay_ms = min(retry_policy.max_delay_ms or MAX_INPUT_RETRY_DELAY_MS, MAX_INPUT_RETRY_DELAY_MS)
+        return max(MIN_INPUT_RETRY_DELAY_MS, min(delay_ms, max_delay_ms))

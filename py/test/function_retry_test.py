@@ -137,6 +137,14 @@ def test_no_retries_when_client_retries_disabled(client, setup_app_and_function,
         assert exc_info.value.function_call_count == 1
 
 
+@pytest.mark.parametrize(("initial_delay", "expected"), [(1.0, [1000, 2000, 3000, 3000]), (5.0, [3000] * 4)])
+def test_retry_manager_respects_max_delay(initial_delay, expected):
+    policy = modal.Retries(max_retries=4, initial_delay=initial_delay, max_delay=3.0)
+    manager = RetryManager(policy._to_proto())
+    assert [manager.get_delay_ms() for _ in range(4)] == expected
+    assert manager.get_delay_ms() is None
+
+
 def test_retry_delay_ms():
     with pytest.raises(ValueError):
         RetryManager._retry_delay_ms(0, api_pb2.FunctionRetryPolicy())

@@ -6,6 +6,7 @@ Draft releases notes should be added as part of the PR introducing the change. D
 
 ## Python
 
+- Client-side function retries now honor the configured `modal.Retries(max_delay=...)` from the first retry onward.
 - Added `Workspace.audit_logs.fetch()` and `Workspace.audit_logs.count()` to read and count workspace audit events from the SDK. Counting requires an explicit `since` datetime. The `modal workspace audit-logs` CLI streams full events as newline-delimited JSON.
 - Added `modal workspace audit-logs --csv` to export workspace audit events as CSV.
 - `Sandbox.wait_until_ready()` now works without a readiness probe, returning when the Sandbox has started.
